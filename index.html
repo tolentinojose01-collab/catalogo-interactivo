@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>GAETO - SISTEMA CON VIGENCIA</title>
+    <style>
+        :root { --azul: #002b5c; --rojo: #e60000; --verde: #25d366; --gris: #777; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: #333; padding-top: 80px; }
+
+        .no-imprimir { 
+            position: fixed; top: 0; left: 0; width: 100%; 
+            background: #000; padding: 15px; display: flex; 
+            justify-content: center; gap: 10px; z-index: 9999; 
+            border-bottom: 3px solid var(--azul);
+        }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; color: #fff; font-weight: bold; text-transform: uppercase; font-size: 11px; }
+
+        #papel-a4 { width: 210mm; margin: 0 auto; background: #fff; padding: 15mm; min-height: 297mm; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+        header { text-align: center; border-bottom: 5px solid var(--azul); padding-bottom: 20px; margin-bottom: 30px; }
+        .logo { width: 280px; display: block; margin: 0 auto; }
+        .subtitle { display: block; font-size: 28px; color: var(--azul); font-weight: bold; text-transform: uppercase; margin-top: 5px; }
+
+        .producto { border: 1px solid #ddd; border-radius: 12px; padding: 25px; margin-bottom: 35px; page-break-inside: avoid; position: relative; }
+        
+        .promo-tag { 
+            position: absolute; top: 15px; right: 15px; background: var(--rojo); 
+            color: #fff; padding: 8px 15px; font-size: 16px; font-weight: bold; 
+            border-radius: 5px; z-index: 5; text-transform: uppercase; text-align: right;
+        }
+        .vigencia-texto { font-size: 10px; display: block; margin-top: 2px; opacity: 0.9; }
+
+        .foto-box { width: 100%; height: auto; min-height: 250px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px solid #eee; }
+        .foto-box img { max-height: 500px; max-width: 100%; object-fit: contain; }
+
+        .titulo-display { font-size: 26px; color: var(--azul); font-weight: bold; text-transform: uppercase; margin-top: 10px; outline: none; }
+        .medida-display { font-size: 19px; color: var(--gris); font-weight: bold; text-transform: uppercase; margin-top: 5px; margin-bottom: 15px; outline: none; min-height: 24px; }
+
+        .descripcion-box { 
+            background: #fcfcfc; padding: 15px; border-left: 10px solid var(--azul); 
+            margin: 15px 0; border: 1px solid #eee; border-left-width: 10px;
+            font-family: 'Georgia', serif; font-size: 18px; line-height: 1.6; color: #222; 
+            outline: none; white-space: pre-wrap; word-wrap: break-word; min-height: 60px;
+        }
+
+        .precio-area { margin: 20px 0; border-top: 1px solid #eee; padding-top: 15px; }
+        .precio-antes { font-size: 20px; color: #999; text-decoration: line-through; display: block; margin-bottom: 5px; font-weight: bold; }
+        .precio-final { font-size: 55px; font-weight: bold; color: var(--azul); }
+
+        .wa-btn { background: var(--verde); color: #fff; text-decoration: none; display: block; text-align: center; padding: 18px; border-radius: 8px; font-weight: bold; font-size: 20px; margin-top: 10px; }
+
+        .pie { background: var(--azul); color: #fff; padding: 35px; text-align: center; margin-top: 30px; border-radius: 10px; }
+        .pie p { margin-bottom: 8px; font-size: 16px; font-weight: bold; text-transform: uppercase; }
+
+        .editor-controles { background: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc; font-size: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: relative; z-index: 100; }
+        .editor-controles input, .editor-controles select { padding: 5px; border: 1px solid #bbb; border-radius: 4px; }
+        
+        .modo-cliente .editor-controles, .modo-cliente .btn-borrar { display: none !important; }
+
+        @media print {
+            .no-imprimir, .editor-controles, .btn-borrar { display: none !important; }
+            body { background: #fff !important; padding: 0; }
+            #papel-a4 { margin: 0 !important; width: 100% !important; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-imprimir">
+    <button class="btn" style="background: var(--rojo);" onclick="reiniciarTodo()">⚠️ REPARAR Y LIMPIAR</button>
+    <button class="btn" style="background: #444;" onclick="document.body.classList.toggle('modo-cliente')">👁️ VISTA CLIENTE</button>
+    <button class="btn" style="background: var(--azul);" onclick="window.print()">🖨️ PDF</button>
+    <button class="btn" style="background: #ff9800;" onclick="agregar()">➕ AGREGAR</button>
+</div>
+
+<div id="papel-a4">
+    <header>
+        <img src="https://i.postimg.cc/4NxxmFmw/gaeto100.jpg" class="logo">
+        <span class="subtitle">FÁBRICA DE PERSIANAS</span>
+    </header>
+
+    <div id="lista-items"></div>
+
+    <div class="pie">
+        <p>✅ VISITAS A DOMICILIO CON MUESTRARIO DE TELAS</p>
+        <p>✅ PRESUPUESTO SIN COMPROMISO</p>
+        <p>🛠️ REPARACIONES Y MANTENIMIENTO DE PERSIANAS ENROLLABLES</p>
+        <h2 style="margin-top: 15px; font-size: 30px;">WHATSAPP: 228 287 7441</h2>
+    </div>
+</div>
+
+<script>
+    const fichasTecnicas = {
+        "SCREEN": "Tejido técnico PVC/Poliéster. Filtra el 95% de los rayos UV, protege muebles y pisos. Permite ver al exterior con privacidad de día.",
+        "BLACKOUT": "Bloqueo lumínico del 100%. Actúa como barrera térmica reduciendo la temperatura interior. Ideal para recámaras.",
+        "TRASLUCIDA": "Poliéster premium de tejido cerrado. Permite el paso de luz suave eliminando el brillo directo del sol, garantizando privacidad total.",
+        "SHEER": "Persiana Sheer Elegance: Sistema de doble franja que permite control total de luz y privacidad con un diseño elegante.",
+        "PLAIN": "Persiana Sheer Elegance Colección Plain 4.5: Diseño de franjas sólidas con acabado liso y minimalista. Ideal para ambientes modernos.",
+        "PLAIN_BICOLOR": "Persiana Sheer Elegance Plain 4.5 Bicolor: Exclusivo diseño que combina dos tonos en el tejido, creando un contraste visual elegante.",
+        "PLATINUM": "Persiana Sheer Elegance Colección Platinum 4.5: Tejido de alta gama con texturas metalizadas y acabados premium. Sofisticación y brillo sutil.",
+        "PLATINUM_BICOLOR": "Persiana Sheer Elegance Platinum 4.5 Bicolor: Combinación de fibras metalizadas en dos tonos. Máxima elegancia con efectos de relieve.",
+        "DUERO": "Tela Duero Traslúcida: Tejido de poliéster con textura lineal refinada. Filtra la luz de manera homogénea creando ambientes cálidos.",
+        "COMPONENTE": "Componente original de alta durabilidad para sistemas de persianas enrollables."
+    };
+
+    const hoy = new Date().toISOString().split('T')[0];
+    let memoria = JSON.parse(localStorage.getItem('gaeto_v_vigencia')) || [];
+
+    function dibujar() {
+        const contenedor = document.getElementById('lista-items');
+        contenedor.innerHTML = "";
+        
+        memoria.forEach((p, index) => {
+            const pLista = parseFloat(p.precio) || 0;
+            const desc = parseFloat(p.desc) || 0;
+            const pFinal = pLista - (pLista * (desc / 100));
+            
+            let fechaFormateada = "";
+            if(p.vigencia) {
+                const partes = p.vigencia.split('-');
+                if(partes.length === 3) fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+
+            // --- CONFIGURACIÓN DE WHATSAPP MÁS COMPLETA ---
+            let msjPromo = desc > 0 ? `\n🎁 *PROMO:* ${desc}% DE DESCUENTO\n📉 *PRECIO LISTA:* $${pLista.toLocaleString('es-MX')}\n⏳ *VÁLIDO HASTA:* ${fechaFormateada}` : "";
+            
+            const mensajeWA = `¡Hola *GAETO*! 👋\nMe interesa el siguiente producto de su catálogo:\n\n📦 *PRODUCTO:* ${p.tit}\n📏 *DETALLE:* ${p.medida}${msjPromo}\n💰 *PRECIO FINAL:* $${pFinal.toLocaleString('es-MX', {minimumFractionDigits: 2})} / ${p.unidad}\n\n¿Podrían darme más información?`;
+            
+            const linkWA = `https://wa.me/522282877441?text=${encodeURIComponent(mensajeWA)}`;
+
+            contenedor.innerHTML += `
+                <div class="producto">
+                    <div class="editor-controles">
+                        <b>TELA:</b>
+                        <select onchange="cambiarTipo(${index}, this.value)">
+                            <option value="SCREEN" ${p.tipo=='SCREEN'?'selected':''}>SCREEN</option>
+                            <option value="BLACKOUT" ${p.tipo=='BLACKOUT'?'selected':''}>BLACKOUT</option>
+                            <option value="TRASLUCIDA" ${p.tipo=='TRASLUCIDA'?'selected':''}>TRASLUCIDA</option>
+                            <option value="SHEER" ${p.tipo=='SHEER'?'selected':''}>SHEER ELEGANCE</option>
+                            <option value="PLAIN" ${p.tipo=='PLAIN'?'selected':''}>PLAIN 4.5</option>
+                            <option value="PLAIN_BICOLOR" ${p.tipo=='PLAIN_BICOLOR'?'selected':''}>PLAIN 4.5 BICOLOR</option>
+                            <option value="PLATINUM" ${p.tipo=='PLATINUM'?'selected':''}>PLATINUM 4.5</option>
+                            <option value="PLATINUM_BICOLOR" ${p.tipo=='PLATINUM_BICOLOR'?'selected':''}>PLATINUM 4.5 BICOLOR</option>
+                            <option value="DUERO" ${p.tipo=='DUERO'?'selected':''}>DUERO TRASLÚCIDA</option>
+                            <option value="COMPONENTE" ${p.tipo=='COMPONENTE'?'selected':''}>COMPONENTE</option>
+                        </select>
+                        <b>UNIDAD:</b>
+                        <select onchange="upd(${index}, 'unidad', this.value)">
+                            <option value="M2" ${p.unidad=='M2'?'selected':''}>M2</option>
+                            <option value="ML" ${p.unidad=='ML'?'selected':''}>ML</option>
+                            <option value="PIEZA" ${p.unidad=='PIEZA'?'selected':''}>PIEZA</option>
+                            <option value="JUEGO" ${p.unidad=='JUEGO'?'selected':''}>JUEGO</option>
+                        </select>
+                        <b>$ LISTA:</b> <input type="number" value="${p.precio}" onchange="upd(${index},'precio',this.value)" style="width:75px">
+                        <b>% DESC:</b> <input type="number" value="${p.desc}" onchange="upd(${index},'desc',this.value)" style="width:45px">
+                        <b>VIGENCIA:</b> <input type="date" value="${p.vigencia}" onchange="upd(${index},'vigencia',this.value)">
+                        <b>IMG URL:</b> <input type="text" value="${p.img}" onchange="upd(${index},'img',this.value)" style="width:100px" placeholder="Link">
+                        <button onclick="borrar(${index})" style="background:red; color:white; border:none; padding:3px 7px; border-radius:4px;">BORRAR</button>
+                    </div>
+
+                    ${desc > 0 ? `
+                        <div class="promo-tag">
+                            PROMOCIÓN
+                            <span class="vigencia-texto">VÁLIDO HASTA: ${fechaFormateada}</span>
+                        </div>
+                    ` : ''}
+
+                    <div class="foto-box"><img src="${p.img || 'https://via.placeholder.com/600x400?text=SIN+FOTO'}"></div>
+                    
+                    <div contenteditable="true" class="titulo-display" oninput="guardarSimple(${index}, 'tit', this.innerText)">${p.tit}</div>
+                    <div contenteditable="true" class="medida-display" oninput="guardarSimple(${index}, 'medida', this.innerText)">${p.medida}</div>
+                    <div contenteditable="true" class="descripcion-box" oninput="guardarSimple(${index}, 'customFicha', this.innerText)">${p.customFicha}</div>
+
+                    <div class="precio-area">
+                        ${desc > 0 ? `<span class="precio-antes">Precio de lista: $${pLista.toLocaleString('es-MX')}</span>` : ''}
+                        <span class="precio-final">$${pFinal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                        <span style="color:var(--azul); font-weight:bold; font-size:20px;"> ${p.unidad}</span>
+                    </div>
+
+                    <a href="${linkWA}" target="_blank" class="wa-btn">🟢 CONSULTAR POR WHATSAPP</a>
+                </div>
+            `;
+        });
+        localStorage.setItem('gaeto_v_vigencia', JSON.stringify(memoria));
+    }
+
+    function cambiarTipo(idx, t) {
+        memoria[idx].tipo = t;
+        const titulos = {
+            "SCREEN": "PERSIANA ENROLLABLE SCREEN",
+            "BLACKOUT": "PERSIANA ENROLLABLE BLACKOUT",
+            "TRASLUCIDA": "PERSIANA ENROLLABLE TRASLÚCIDA",
+            "SHEER": "PERSIANA SHEER ELEGANCE",
+            "PLAIN": "PERSIANA SHEER ELEGANCE PLAIN 4.5",
+            "PLAIN_BICOLOR": "PERSIANA SHEER ELEGANCE PLAIN 4.5 BICOLOR",
+            "PLATINUM": "PERSIANA SHEER ELEGANCE PLATINUM 4.5",
+            "PLATINUM_BICOLOR": "PERSIANA SHEER ELEGANCE PLATINUM 4.5 BICOLOR",
+            "DUERO": "PERSIANA DUERO TRASLÚCIDA",
+            "COMPONENTE": "COMPONENTE DE PERSIANA"
+        };
+        memoria[idx].tit = titulos[t];
+        memoria[idx].customFicha = fichasTecnicas[t];
+        dibujar();
+    }
+
+    function guardarSimple(idx, campo, valor) {
+        memoria[idx][campo] = valor.toUpperCase();
+        localStorage.setItem('gaeto_v_vigencia', JSON.stringify(memoria));
+    }
+
+    function upd(idx, f, v) { memoria[idx][f] = v; dibujar(); }
+    
+    function agregar() { 
+        memoria.push({
+            tit:'PERSIANA ENROLLABLE SCREEN', 
+            medida:'MEDIDA: 1.00 X 1.00', 
+            img:'', 
+            tipo:'SCREEN', 
+            precio:0, 
+            desc:0, 
+            unidad:'M2', 
+            vigencia: hoy,
+            customFicha: fichasTecnicas["SCREEN"]
+        }); 
+        dibujar(); 
+    }
+
+    function borrar(idx) { if(confirm('¿Borrar producto?')) { memoria.splice(idx, 1); dibujar(); } }
+    function reiniciarTodo() { if(confirm('¿Limpiar todo el sistema?')) { localStorage.clear(); location.reload(); } }
+
+    if(memoria.length === 0) agregar(); else dibujar();
+</script>
+</body>
+</html>
