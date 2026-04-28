@@ -2,7 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAETO - SISTEMA CON VIGENCIA</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002b5c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GAETO">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/4NxxmFmw/gaeto100.jpg">
+
     <style>
         :root { --azul: #002b5c; --rojo: #e60000; --verde: #25d366; --gris: #777; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,13 +73,19 @@
             body { background: #fff !important; padding: 0; }
             #papel-a4 { margin: 0 !important; width: 100% !important; box-shadow: none !important; }
         }
+
+        /* Ajuste para pantallas pequeñas */
+        @media (max-width: 210mm) {
+            #papel-a4 { width: 95%; padding: 10mm; }
+            .precio-final { font-size: 40px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="no-imprimir">
-    <button class="btn" style="background: var(--rojo);" onclick="reiniciarTodo()">⚠️ REPARAR Y LIMPIAR</button>
-    <button class="btn" style="background: #444;" onclick="document.body.classList.toggle('modo-cliente')">👁️ VISTA CLIENTE</button>
+    <button class="btn" style="background: var(--rojo);" onclick="reiniciarTodo()">⚠️ REPARAR</button>
+    <button class="btn" style="background: #444;" onclick="document.body.classList.toggle('modo-cliente')">👁️ VISTA</button>
     <button class="btn" style="background: var(--azul);" onclick="window.print()">🖨️ PDF</button>
     <button class="btn" style="background: #ff9800;" onclick="agregar()">➕ AGREGAR</button>
 </div>
@@ -85,23 +101,23 @@
     <div class="pie">
         <p>✅ VISITAS A DOMICILIO CON MUESTRARIO DE TELAS</p>
         <p>✅ PRESUPUESTO SIN COMPROMISO</p>
-        <p>🛠️ REPARACIONES Y MANTENIMIENTO DE PERSIANAS ENROLLABLES</p>
+        <p>🛠️ REPARACIONES Y MANTENIMIENTO</p>
         <h2 style="margin-top: 15px; font-size: 30px;">WHATSAPP: 228 287 7441</h2>
     </div>
 </div>
 
 <script>
     const fichasTecnicas = {
-        "SCREEN": "Tejido técnico PVC/Poliéster. Filtra el 95% de los rayos UV, protege muebles y pisos. Permite ver al exterior con privacidad de día.",
-        "BLACKOUT": "Bloqueo lumínico del 100%. Actúa como barrera térmica reduciendo la temperatura interior. Ideal para recámaras.",
-        "TRASLUCIDA": "Poliéster premium de tejido cerrado. Permite el paso de luz suave eliminando el brillo directo del sol, garantizando privacidad total.",
-        "SHEER": "Persiana Sheer Elegance: Sistema de doble franja que permite control total de luz y privacidad con un diseño elegante.",
-        "PLAIN": "Persiana Sheer Elegance Colección Plain 4.5: Diseño de franjas sólidas con acabado liso y minimalista. Ideal para ambientes modernos.",
-        "PLAIN_BICOLOR": "Persiana Sheer Elegance Plain 4.5 Bicolor: Exclusivo diseño que combina dos tonos en el tejido, creando un contraste visual elegante.",
-        "PLATINUM": "Persiana Sheer Elegance Colección Platinum 4.5: Tejido de alta gama con texturas metalizadas y acabados premium. Sofisticación y brillo sutil.",
-        "PLATINUM_BICOLOR": "Persiana Sheer Elegance Platinum 4.5 Bicolor: Combinación de fibras metalizadas en dos tonos. Máxima elegancia con efectos de relieve.",
-        "DUERO": "Tela Duero Traslúcida: Tejido de poliéster con textura lineal refinada. Filtra la luz de manera homogénea creando ambientes cálidos.",
-        "COMPONENTE": "Componente original de alta durabilidad para sistemas de persianas enrollables."
+        "SCREEN": "Tejido técnico PVC/Poliéster. Filtra el 95% de los rayos UV. Permite ver al exterior con privacidad de día.",
+        "BLACKOUT": "Bloqueo lumínico del 100%. Actúa como barrera térmica. Ideal para recámaras.",
+        "TRASLUCIDA": "Poliéster premium de tejido cerrado. Permite el paso de luz suave, garantizando privacidad total.",
+        "SHEER": "Persiana Sheer Elegance: Sistema de doble franja que permite control total de luz y privacidad.",
+        "PLAIN": "Persiana Sheer Elegance Colección Plain 4.5: Diseño de franjas sólidas con acabado liso.",
+        "PLAIN_BICOLOR": "Persiana Sheer Elegance Plain 4.5 Bicolor: Diseño que combina dos tonos en el tejido.",
+        "PLATINUM": "Persiana Sheer Elegance Colección Platinum 4.5: Tejido de alta gama con texturas metalizadas.",
+        "PLATINUM_BICOLOR": "Persiana Sheer Elegance Platinum 4.5 Bicolor: Combinación de fibras metalizadas en dos tonos.",
+        "DUERO": "Tela Duero Traslúcida: Tejido de poliéster con textura lineal refinada. Crea ambientes cálidos.",
+        "COMPONENTE": "Componente original de alta durabilidad para sistemas de persianas."
     };
 
     const hoy = new Date().toISOString().split('T')[0];
@@ -122,11 +138,8 @@
                 if(partes.length === 3) fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
 
-            // --- CONFIGURACIÓN DE WHATSAPP MÁS COMPLETA ---
-            let msjPromo = desc > 0 ? `\n🎁 *PROMO:* ${desc}% DE DESCUENTO\n📉 *PRECIO LISTA:* $${pLista.toLocaleString('es-MX')}\n⏳ *VÁLIDO HASTA:* ${fechaFormateada}` : "";
-            
-            const mensajeWA = `¡Hola *GAETO*! 👋\nMe interesa el siguiente producto de su catálogo:\n\n📦 *PRODUCTO:* ${p.tit}\n📏 *DETALLE:* ${p.medida}${msjPromo}\n💰 *PRECIO FINAL:* $${pFinal.toLocaleString('es-MX', {minimumFractionDigits: 2})} / ${p.unidad}\n\n¿Podrían darme más información?`;
-            
+            let msjPromo = desc > 0 ? `\n🎁 *PROMO:* ${desc}% DESC\n⏳ *VÁLIDO HASTA:* ${fechaFormateada}` : "";
+            const mensajeWA = `¡Hola *GAETO*! 👋\nMe interesa este producto:\n\n📦 *PRODUCTO:* ${p.tit}\n📏 *DETALLE:* ${p.medida}${msjPromo}\n💰 *PRECIO:* $${pFinal.toLocaleString('es-MX', {minimumFractionDigits: 2})} / ${p.unidad}`;
             const linkWA = `https://wa.me/522282877441?text=${encodeURIComponent(mensajeWA)}`;
 
             contenedor.innerHTML += `
@@ -142,7 +155,7 @@
                             <option value="PLAIN_BICOLOR" ${p.tipo=='PLAIN_BICOLOR'?'selected':''}>PLAIN 4.5 BICOLOR</option>
                             <option value="PLATINUM" ${p.tipo=='PLATINUM'?'selected':''}>PLATINUM 4.5</option>
                             <option value="PLATINUM_BICOLOR" ${p.tipo=='PLATINUM_BICOLOR'?'selected':''}>PLATINUM 4.5 BICOLOR</option>
-                            <option value="DUERO" ${p.tipo=='DUERO'?'selected':''}>DUERO TRASLÚCIDA</option>
+                            <option value="DUERO" ${p.tipo=='DUERO'?'selected':''}>DUERO</option>
                             <option value="COMPONENTE" ${p.tipo=='COMPONENTE'?'selected':''}>COMPONENTE</option>
                         </select>
                         <b>UNIDAD:</b>
@@ -150,13 +163,11 @@
                             <option value="M2" ${p.unidad=='M2'?'selected':''}>M2</option>
                             <option value="ML" ${p.unidad=='ML'?'selected':''}>ML</option>
                             <option value="PIEZA" ${p.unidad=='PIEZA'?'selected':''}>PIEZA</option>
-                            <option value="JUEGO" ${p.unidad=='JUEGO'?'selected':''}>JUEGO</option>
                         </select>
-                        <b>$ LISTA:</b> <input type="number" value="${p.precio}" onchange="upd(${index},'precio',this.value)" style="width:75px">
-                        <b>% DESC:</b> <input type="number" value="${p.desc}" onchange="upd(${index},'desc',this.value)" style="width:45px">
+                        <b>$ LISTA:</b> <input type="number" value="${p.precio}" onchange="upd(${index},'precio',this.value)" style="width:70px">
+                        <b>% DESC:</b> <input type="number" value="${p.desc}" onchange="upd(${index},'desc',this.value)" style="width:40px">
                         <b>VIGENCIA:</b> <input type="date" value="${p.vigencia}" onchange="upd(${index},'vigencia',this.value)">
-                        <b>IMG URL:</b> <input type="text" value="${p.img}" onchange="upd(${index},'img',this.value)" style="width:100px" placeholder="Link">
-                        <button onclick="borrar(${index})" style="background:red; color:white; border:none; padding:3px 7px; border-radius:4px;">BORRAR</button>
+                        <button onclick="borrar(${index})" style="background:red; color:white; border:none; padding:3px 7px; border-radius:4px;">X</button>
                     </div>
 
                     ${desc > 0 ? `
@@ -166,7 +177,7 @@
                         </div>
                     ` : ''}
 
-                    <div class="foto-box"><img src="${p.img || 'https://via.placeholder.com/600x400?text=SIN+FOTO'}"></div>
+                    <div class="foto-box"><img src="${p.img || 'https://via.placeholder.com/600x400?text=GAETO+PERSIANAS'}"></div>
                     
                     <div contenteditable="true" class="titulo-display" oninput="guardarSimple(${index}, 'tit', this.innerText)">${p.tit}</div>
                     <div contenteditable="true" class="medida-display" oninput="guardarSimple(${index}, 'medida', this.innerText)">${p.medida}</div>
@@ -192,10 +203,10 @@
             "BLACKOUT": "PERSIANA ENROLLABLE BLACKOUT",
             "TRASLUCIDA": "PERSIANA ENROLLABLE TRASLÚCIDA",
             "SHEER": "PERSIANA SHEER ELEGANCE",
-            "PLAIN": "PERSIANA SHEER ELEGANCE PLAIN 4.5",
-            "PLAIN_BICOLOR": "PERSIANA SHEER ELEGANCE PLAIN 4.5 BICOLOR",
-            "PLATINUM": "PERSIANA SHEER ELEGANCE PLATINUM 4.5",
-            "PLATINUM_BICOLOR": "PERSIANA SHEER ELEGANCE PLATINUM 4.5 BICOLOR",
+            "PLAIN": "PERSIANA SHEER PLAIN 4.5",
+            "PLAIN_BICOLOR": "PERSIANA SHEER PLAIN 4.5 BICOLOR",
+            "PLATINUM": "PERSIANA SHEER PLATINUM 4.5",
+            "PLATINUM_BICOLOR": "PERSIANA SHEER PLATINUM 4.5 BICOLOR",
             "DUERO": "PERSIANA DUERO TRASLÚCIDA",
             "COMPONENTE": "COMPONENTE DE PERSIANA"
         };
@@ -226,8 +237,8 @@
         dibujar(); 
     }
 
-    function borrar(idx) { if(confirm('¿Borrar producto?')) { memoria.splice(idx, 1); dibujar(); } }
-    function reiniciarTodo() { if(confirm('¿Limpiar todo el sistema?')) { localStorage.clear(); location.reload(); } }
+    function borrar(idx) { if(confirm('¿Borrar?')) { memoria.splice(idx, 1); dibujar(); } }
+    function reiniciarTodo() { if(confirm('¿Limpiar?')) { localStorage.clear(); location.reload(); } }
 
     if(memoria.length === 0) agregar(); else dibujar();
 </script>
